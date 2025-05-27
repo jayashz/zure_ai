@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Socket Chat</title>
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <h1>Chat</h1>
+    <ul id="messages"></ul>
+    <input id="input" autocomplete="off" /><button onclick="sendMessage()">
+      Send
+    </button>
+
+    <script>
+      const socket = io();
+
+      function renderMessage(msg) {
+        const item = document.createElement("li");
+        item.className = msg.isUser ? "user: " : "Ai: ";
+        item.textContent = msg.text;
+        item.style.color = msg.isUser ? "blue" : "green";
+        document.getElementById("messages").appendChild(item);
+      }
+
+      function sendMessage() {
+        const input = document.getElementById("input");
+        socket.emit("user", input.value);
+        input.value = "";
+      }
+      socket.on("previousMessages", (msgs) => {
+        msgs.forEach(renderMessage);
+      });
+
+      socket.on("ai_message", renderMessage);
+      socket.on("user", renderMessage);
+    </script>
+  </body>
+</html>
