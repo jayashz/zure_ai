@@ -22,14 +22,13 @@ class _HomeWidgetState extends State<HomeWidget> {
     initSocket();
     super.initState();
   }
-
   void initSocket() {
     try {
       socket = io.io('http://192.168.1.11:3000', <String, dynamic>{
         'transports': ['websocket'],
         'auth': {
           'token':
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkNyaXRpY2FsaXR5Zml0eSJ9.eyJ1c2VybmFtZSI6IjEyMzQ1Njc4OTAiLCJwYXNzd29yZCI6IkpvaG4gRG9lIn0.YngTHjvf7ex2WvOAD_UUk4z1AQXM7wdow9OteSW_M-g',
+              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjEyMzQ1Njc4OTAiLCJwYXNzd29yZCI6IkpvaG4gRG9lIn0.NJDQysvZFpi1_VhnTP-TqVVHzyMYPcdew-4kgo7thXc',
         },
       });
 

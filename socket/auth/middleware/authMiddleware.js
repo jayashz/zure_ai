@@ -27,7 +27,10 @@ export function verifySocketToken(socket, next) {
   if (!token) return next(new Error("No token provided"));
 
   verify(token, secret, (err, decoded) => {
-    if (err) return next(new Error("Unauthorized"));
+    if (err) {
+      console.error("JWT error:", err.message); 
+      return next(new Error("Unauthorized"));
+    }
     socket.user = decoded;
     next();
   });

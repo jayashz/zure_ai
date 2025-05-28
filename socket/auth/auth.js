@@ -2,6 +2,8 @@ import { Router } from "express";
 import { hash, compare } from "bcryptjs";
 import { secret } from "./middleware/authMiddleware.js";
 import User from "./models/user.js";
+import jwt from "jsonwebtoken";
+const { sign } = jwt;
 const router = Router();
 
 // POST /api/auth/register
@@ -44,4 +46,4 @@ router.post("/login", async (req, res) => {
   }
 });
 
-export default router ;
+export default router;

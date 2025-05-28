@@ -36,6 +36,8 @@ db.once("open", () => {
   console.log("Connected to MongoDB");
 });
 
+app.use(express.json());
+
 //Routes
 app.use("/api/auth", routes);
 
