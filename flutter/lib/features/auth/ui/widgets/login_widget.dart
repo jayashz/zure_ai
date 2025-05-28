@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:zure_ai/features/auth/repository/auth_repository.dart';
 import 'package:zure_ai/features/auth/ui/pages/sign_page.dart';
+import 'package:zure_ai/features/home/ui/pages/home_page.dart';
 
 class LoginWidget extends StatelessWidget {
   const LoginWidget({super.key});
@@ -101,9 +102,19 @@ class LoginWidget extends StatelessWidget {
                   ),
                   onPressed: () async {
                     if (_formKey.currentState!.saveAndValidate()) {
-                      await authRepo.login(
+                      authRepo.login(
                         _formKey.currentState!.value['email'],
                         _formKey.currentState!.value['password'],
+                      );
+                      if (!context.mounted) {
+                        return;
+                      }
+                      Navigator.pushReplacement(
+                        context,
+                        PageTransition(
+                          type: PageTransitionType.fade,
+                          child: const HomePage(),
+                        ),
                       );
                     }
                   },

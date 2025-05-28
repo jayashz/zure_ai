@@ -1,33 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:zure_ai/features/auth/ui/pages/login_page.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:zure_ai/features/auth/repository/auth_repository.dart';
+import 'package:zure_ai/features/splash/cubit/startup_cubit.dart';
+
 import 'package:zure_ai/features/splash/ui/widgets/splash_widget.dart';
 
-class SplashPage extends StatefulWidget {
+class SplashPage extends StatelessWidget {
   const SplashPage({super.key});
 
   @override
-  State<SplashPage> createState() => _SplashPageState();
-}
-
-class _SplashPageState extends State<SplashPage> {
-  @override
-  void initState() {
-    super.initState();
-    _navigateToLogin();
-  }
-
-  void _navigateToLogin() async {
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
-    Navigator.pushReplacement(
-      context,
-      PageTransition(type: PageTransitionType.fade, child: const LoginPage()),
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return const SplashWidget();
+    return BlocProvider(
+      create:
+          (context) =>
+              StartupCubit(authRepository: context.read<AuthRepository>())
+                ..init(),
+      child: const SplashWidget(),
+    );
   }
 }

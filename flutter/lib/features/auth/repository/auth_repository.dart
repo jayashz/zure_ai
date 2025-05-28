@@ -3,8 +3,21 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zure_ai/core/constant.dart';
+import 'package:zure_ai/core/services/database_services.dart';
 
 class AuthRepository {
+  final DatabaseServices databaseServices = DatabaseServices();
+  String _token = "";
+
+  String get getToken => _token;
+
+  Future<void> init() async {
+    final tempToken = await databaseServices.getToken();
+    if (tempToken.isNotEmpty) {
+      _token = tempToken;
+    }
+  }
+
   Future<bool> login(String username, String password) async {
     final url = Uri.parse('${Constant.ipAddress}/api/auth/login');
 

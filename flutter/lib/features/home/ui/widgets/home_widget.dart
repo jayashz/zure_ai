@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:page_transition/page_transition.dart';
+import 'package:zure_ai/core/constant.dart';
+import 'package:zure_ai/core/services/database_services.dart';
+import 'package:zure_ai/features/auth/repository/auth_repository.dart';
 import 'package:zure_ai/features/home/models/message.dart';
+import 'package:zure_ai/features/splash/ui/pages/splash_page.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 
@@ -14,6 +20,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   late io.Socket socket;
   List<Message> messages = [];
 
+  final DatabaseServices databaseServices = DatabaseServices();
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -22,14 +29,12 @@ class _HomeWidgetState extends State<HomeWidget> {
     initSocket();
     super.initState();
   }
+
   void initSocket() {
     try {
-      socket = io.io('http://192.168.1.11:3000', <String, dynamic>{
+      socket = io.io(Constant.ipAddress, <String, dynamic>{
         'transports': ['websocket'],
-        'auth': {
-          'token':
-              'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IjEyMzQ1Njc4OTAiLCJwYXNzd29yZCI6IkpvaG4gRG9lIn0.NJDQysvZFpi1_VhnTP-TqVVHzyMYPcdew-4kgo7thXc',
-        },
+        'auth': {'token': context.read<AuthRepository>().getToken},
       });
 
       socket.connect();
@@ -197,6 +202,24 @@ class _HomeWidgetState extends State<HomeWidget> {
           centerTitle: true,
           backgroundColor: AppTheme.backgroundColor,
           elevation: 0,
+          actions: [
+            IconButton(
+              onPressed: () async {
+                await databaseServices.removeToken();
+                if (!context.mounted) {
+                  return;
+                }
+                Navigator.pushReplacement(
+                  context,
+                  PageTransition(
+                    type: PageTransitionType.fade,
+                    child: const SplashPage(),
+                  ),
+                );
+              },
+              icon: Icon(Icons.logout),
+            ),
+          ],
         ),
         body: SafeArea(
           child: Column(
