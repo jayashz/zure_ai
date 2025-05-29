@@ -27,16 +27,16 @@ Zure AI Assistant is a real-time chat application powered by Google Gemini AI. I
 
 ## 🗂️ Project Structure
 zure-ai/
-├── auth/                  # Authentication logic
-├── config/                # DB and environment setup
-├── controllers/           # Message logic
-├── middleware/            # Auth + socket validation
-├── models/                # Mongoose schemas
-├── routes/                # API route handlers
-├── services/              # AI integration service
-├── sockets/               # Socket.io event logic
-├── keys.env               # Environment variables
-└── server.js              # Entry point
+├── auth/           → 🔐 Authentication logic (signup, login, token generation)
+├── config/         → ⚙️ Database connection & environment configuration
+├── controllers/    → 🧠 Core logic for handling messages (optional abstraction)
+├── middleware/     → 🛡️ JWT and Socket.IO token validation
+├── models/         → 🗃️ Mongoose schemas for MongoDB collections
+├── routes/         → 🌐 REST API route handlers
+├── services/       → 🤖 Google GenAI integration logic
+├── sockets/        → 📡 WebSocket event handlers
+├── keys.env        → 🔑 Environment variables (DO NOT commit this!)
+└── server.js       → 🚀 Entry point to start the server
 
 ---
 
