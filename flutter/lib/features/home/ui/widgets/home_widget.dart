@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:zure_ai/core/constant.dart';
+import 'package:zure_ai/core/bloc/socket_state.dart';
 import 'package:zure_ai/core/services/database_services.dart';
 import 'package:zure_ai/features/auth/repository/auth_repository.dart';
+import 'package:zure_ai/features/home/cubit/socket_cubit.dart';
 import 'package:zure_ai/features/home/models/message.dart';
+import 'package:zure_ai/features/home/repository/socket_repository.dart';
 import 'package:zure_ai/features/splash/ui/pages/splash_page.dart';
 import '../../../../core/theme/app_theme.dart';
-import 'package:socket_io_client/socket_io_client.dart' as io;
 
 class HomeWidget extends StatefulWidget {
   const HomeWidget({super.key});
@@ -17,75 +18,21 @@ class HomeWidget extends StatefulWidget {
 }
 
 class _HomeWidgetState extends State<HomeWidget> {
-  late io.Socket socket;
-  List<Message> messages = [];
-
   final DatabaseServices databaseServices = DatabaseServices();
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    initSocket();
-    super.initState();
-  }
-
-  void initSocket() {
-    try {
-      socket = io.io(Constant.ipAddress, <String, dynamic>{
-        'transports': ['websocket'],
-        'auth': {'token': context.read<AuthRepository>().getToken},
-      });
-
-      socket.connect();
-
-      socket.onConnect((_) {
-        print('✅ Connected to server');
-      });
-
-      socket.onConnectError((data) => print("❌ Connect error: $data"));
-      socket.onError((data) => print("❌ General error: $data"));
-
-      socket.on("previousMessages", (data) {
-        setState(() {
-          final mess = data.map<Message>((e) => Message.fromJson(e)).toList();
-          messages.addAll(mess);
-        });
-        _scroller();
-      });
-
-      socket.on('ai_message', (data) {
-        setState(() {
-          messages.add(Message.fromJson(data));
-        });
-        _scroller();
-        print("🤖 Message received: $data");
-      });
-
-      socket.on('user', (data) {
-        setState(() {
-          messages.add(Message.fromJson(data));
-        });
-        _scroller();
-      });
-
-      socket.onDisconnect((_) => print('⚠️ Socket disconnected!'));
-    } catch (e) {
-      print("🔥 Error connecting to socket: $e");
-    }
-  }
+  final List<Message> messages = [];
 
   @override
   void dispose() {
     _controller.dispose();
     _scrollController.dispose();
-    socket.dispose();
     super.dispose();
   }
 
   void _handleSubmit(String text) {
     if (_controller.text.isNotEmpty) {
-      socket.emit('user', _controller.text);
+      context.read<SocketCubit>().sendMessage(text);
       _controller.clear();
     }
 
@@ -205,10 +152,11 @@ class _HomeWidgetState extends State<HomeWidget> {
           actions: [
             IconButton(
               onPressed: () async {
-                await databaseServices.removeToken();
+                context.read<AuthRepository>().logout();
                 if (!context.mounted) {
                   return;
                 }
+                context.read<SocketRepository>().disconnect();
                 Navigator.pushReplacement(
                   context,
                   PageTransition(
@@ -225,13 +173,31 @@ class _HomeWidgetState extends State<HomeWidget> {
           child: Column(
             children: [
               Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
-                  itemCount: messages.length,
-                  itemBuilder:
-                      (context, index) =>
-                          _buildMessageBubble(messages[index], theme),
+                child: BlocConsumer<SocketCubit, SocketState>(
+                  listenWhen: (previous, current) => current is! SocketInitial,
+
+                  listener: (context, state) {
+                    if (state is MessagesLoaded) {
+                      messages.addAll(state.messages);
+                      _scroller();
+                    } else if (state is NewMessageReceived) {
+                      messages.add(state.message);
+                      _scroller();
+                    }
+                  },
+                  builder: (context, state) {
+                    if (state is SocketConnecting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    return ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.all(16),
+                      itemCount: messages.length,
+                      itemBuilder:
+                          (context, index) =>
+                              _buildMessageBubble(messages[index], theme),
+                    );
+                  },
                 ),
               ),
               Container(

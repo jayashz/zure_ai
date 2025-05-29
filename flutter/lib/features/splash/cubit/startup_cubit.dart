@@ -7,13 +7,13 @@ class StartupCubit extends Cubit<CommonState> {
   final AuthRepository authRepository;
   StartupCubit({required this.authRepository}) : super(CommonIntialState());
   void init() async {
-    print("initiated");
-
     emit(CommonLoadingState());
+
     await authRepository.init();
-    print("${authRepository.getToken} Token from the startup");
     await Future.delayed(const Duration(seconds: 2));
     final isLoggedIn = authRepository.getToken.isNotEmpty;
+
+
     final params = StartupData(isLoggedIn: isLoggedIn);
     emit(CommonSuccessState<StartupData>(data: params));
   }
