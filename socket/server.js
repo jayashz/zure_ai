@@ -1,6 +1,9 @@
 import express from "express";
 import mongoose from "mongoose";
 
+import dotenv from "dotenv";
+dotenv.config({ path: "./keys.env" }); // 👈 This must be called before accessing process.env
+
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { GoogleGenAI } from "@google/genai";
@@ -24,7 +27,7 @@ const io = new Server(server, {
 
 // Initialize Google GenAI client with API key
 const ai = new GoogleGenAI({
-  apiKey: "AIzaSyCX1khnmlkbXsw6CmT0msY6qVIoYCrABi8",
+  apiKey: process.env.gem_Api, // Ensure you set this environment variable
 });
 
 connect("mongodb://localhost:27017/chat-app");
