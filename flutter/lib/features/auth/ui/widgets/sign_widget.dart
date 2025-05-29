@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:zure_ai/core/bloc/common_state.dart';
-import 'package:zure_ai/features/auth/cubit/login_cubit.dart';
 import 'package:zure_ai/features/auth/cubit/signup_cubit.dart';
 
 import 'package:zure_ai/features/auth/ui/pages/sign_page.dart';

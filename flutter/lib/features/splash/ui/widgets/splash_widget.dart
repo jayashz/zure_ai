@@ -13,13 +13,25 @@ class SplashWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: BlocBuilder<StartupCubit, CommonState>(
         builder: (context, state) {
           if (state is CommonLoadingState) {
-            return SizedBox(
-              width: double.infinity,
-              height: double.infinity,
-              child: Image.asset('assets/images/splash.jpg', fit: BoxFit.cover),
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.smart_toy, size: 80, color: Colors.deepPurple),
+                  Text(
+                    "Zure Ai",
+                    style: TextStyle(
+                      color: Colors.deepPurple,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             );
           } else if (state is CommonSuccessState<StartupData>) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
